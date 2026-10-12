@@ -3,8 +3,8 @@
     "name": "fn_add_numbers",
     "description": "Add two numbers together and return their sum.",
     "parameters": {
-      "a": {
-        "type": "ffd"
+      "a": {  
+        "type": "number"
       },
       "b": {
         "type": "number"
