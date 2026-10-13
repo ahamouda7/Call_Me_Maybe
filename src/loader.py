@@ -104,28 +104,3 @@ def read_json(path):
         print(f"[ERROR]: Cannot read '{path}': {e}") 
 
     return None
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-
-    parser.add_argument(
-        "--functions_definition",
-        default="data/input/functions_definition.json"
-    )
-    parser.add_argument(
-        "--input",
-        default="data/input/function_calling_tests.json"
-    )
-
-    args = parser.parse_args()
-
-    data = read_json(args.input)
-    if data is not None:
-        prompts = validate_prompt(data)
-        print(prompts)
-
-    data = read_json(args.functions_definition)
-    if data is not None:
-        functions = validate_functions(data)
-        print(functions)
