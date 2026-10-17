@@ -3,22 +3,18 @@
 
 import sys
 import json
-import argparse
 from typing import Dict, Literal
 
-from pydantic import BaseModel, ConfigDict, ValidationError
+from pydantic import BaseModel, Field, ConfigDict, ValidationError
 
 
-JsonType = Literal[
-    "string", "number", "integer", "boolean",
-    "array", "object", "null"
-]
+JsonType = Literal["string", "number", "integer", "boolean"]
 
 
 class Prompts(BaseModel):
     model_config = ConfigDict(extra="forbid", strict=True)
 
-    prompt: str
+    prompt: str = Field(min_length=1)
 
 
 class Parameter(BaseModel):
@@ -30,10 +26,28 @@ class Parameter(BaseModel):
 class FunctionDefinition(BaseModel):
     model_config = ConfigDict(extra="forbid", strict=True)
 
-    name: str
-    description: str
+    name: str = Field(min_length=1)
+    description: str = Field(min_length=1)
     parameters: Dict[str, Parameter]
     returns: Parameter
+
+
+def read_json(path):
+    try:
+        with open(path, "r", encoding="utf-8") as file:
+            return json.load(file)
+
+    except FileNotFoundError:
+        print(f"[ERROR]: File '{path}' not found")
+
+    except json.JSONDecodeError as e:
+        print(f"[ERROR]: Invalid JSON in '{path}': {e}")
+
+    except OSError as e:
+        # FileNotFoundError + PermissionError + IsADirectoryError
+        print(f"[ERROR]: Cannot read '{path}': {e}")
+
+    return None
 
 
 def print_error(e, location):
@@ -43,8 +57,9 @@ def print_error(e, location):
     sys.exit(f"[ERROR] in {location}: {msg}")
 
 
-def validate_prompt(data):
+def validate_prompts(prompts_path):
     prompts = []
+    data = read_json(prompts_path)
 
     if not isinstance(data, list):
         sys.exit("[ERROR]: Prompts must be a list")
@@ -58,8 +73,9 @@ def validate_prompt(data):
     return prompts
 
 
-def validate_functions(data):
+def validate_functions(functions_defintion_path):
     functions = []
+    data = read_json(functions_defintion_path)
 
     if not isinstance(data, list):
         print("[ERROR]: Functions must be a list")
@@ -87,20 +103,3 @@ def validate_functions(data):
         return []
 
     return functions
-
-
-def read_json(path):
-    try:
-        with open(path, "r") as file:
-            return json.load(file)
-
-    except FileNotFoundError:
-        print(f"[ERROR]: File '{path}' not found")
-
-    except json.JSONDecodeError as e:
-        print(f"[ERROR]: Invalid JSON in '{path}': {e}")
-
-    except OSError as e:  # FileNotFoundError + PermissionError + IsADirectoryError
-        print(f"[ERROR]: Cannot read '{path}': {e}") 
-
-    return None
