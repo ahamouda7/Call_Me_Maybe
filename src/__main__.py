@@ -18,6 +18,10 @@ def main() -> None:
 
     Handle unexpected errors by displaying an error message and exiting.
     """
+    green = "\033[32m"
+    red = "\033[31m"
+    reset = "\033[0m"
+
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
@@ -32,9 +36,14 @@ def main() -> None:
         "--output",
         default="data/output/function_calls.json"
     )
+
     parser.add_argument(
         "--model",
         default="Qwen/Qwen3-0.6B"
+    )
+    parser.add_argument(
+        "--visualize",
+        action="store_true"
     )
 
     args = parser.parse_args()
@@ -53,11 +62,22 @@ def main() -> None:
             os.makedirs(output_dir, exist_ok=True)
 
         results = []
-        for prompt in validate_prom:
+        for i, prompt in enumerate(validate_prom):
+            if args.visualize:
+                if results:
+                    print("\n" + "─" * 100)
+                print(f"\n{red}Prompt {i + 1}:{reset} {prompt.prompt}\n")
+
             data = generate_function_call(
-                prompt, validate_func, model, token_to_id, id_to_token
+                prompt, validate_func, model, token_to_id, id_to_token,
+                visualize=args.visualize
             )
             results.append(data.model_dump())
+
+            if args.visualize:
+                print(f"\n{green}Result:{reset}")
+                print(json.dumps(data.model_dump(), indent=2))
+
         with open(args.output, 'w') as f:
             json.dump(results, f, indent=2)
 

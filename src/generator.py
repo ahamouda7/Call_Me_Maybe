@@ -152,7 +152,8 @@ def generate_function_call(
     functions: list[FunctionDefinition],
     model: Any,
     token_to_id: dict[str, int],
-    id_to_token: dict[int, str]
+    id_to_token: dict[int, str],
+    visualize: bool = False
 ) -> FunctionCallResult:
     """
     Generate a function call from a user prompt using the LLM.
@@ -168,6 +169,11 @@ def generate_function_call(
         selected function name, and generated parameters.
         Return an invalid result if no function name is matched.
     """
+    green = "\033[32m"
+    yellow = "\033[33m"
+    blue = "\033[34m"
+    reset = "\033[0m"
+
     # if not is_valid_prompt(prompt.prompt):
     #     return ResultValidation(
     #         prompt=prompt.prompt, name="Invalid!",
@@ -188,6 +194,10 @@ def generate_function_call(
     current_function_prefix = ""
     gen_ids: list[int] = []
     function_names = [fn.name for fn in functions]
+
+    if visualize:
+        print(f"      {yellow}Generating function name ...{reset}")
+
     for _ in range(30):
         full_input_ids = input_ids + gen_ids
         logits = model.get_logits_from_input_ids(full_input_ids)
@@ -202,6 +212,10 @@ def generate_function_call(
 
         current_function_prefix += next_token
         if current_function_prefix in function_names:
+            if visualize:
+                print(f'        - {green}Found:{reset} "{current_function_prefix}"')
+                print(f"\n      {yellow}Generating function's parameters ...{reset}")
+
             selected_function = next(
                 fn for fn in functions if fn.name == current_function_prefix)
             input_ids.extend(gen_ids)
@@ -216,6 +230,8 @@ def generate_function_call(
             params = list(selected_function.parameters.items())
             parameters: dict[str, float | str | int] = {}
             for i, (name, value) in enumerate(params):
+                if visualize:
+                    print(f"        {blue}Generating parameter {i + 1} ...{reset}")
                 input_ids.append(token_to_id['"'])
                 for chr_id in model.encode(name)[0].tolist():
                     input_ids.append(chr_id)
@@ -240,6 +256,9 @@ def generate_function_call(
                             parameters[name] = int(val)
                         input_ids += ids
 
+                    if visualize:
+                        print(f"          - {green}Found:{reset} {name}: {parameters[name]}")
+
                     if i < len(params) - 1:
                         input_ids.append(token_to_id[','])
                         input_ids.append(token_to_id['Ġ'])
@@ -252,6 +271,8 @@ def generate_function_call(
                         input_ids, model, id_to_token)
                     parameters[name] = str_val
                     input_ids += ids
+                    if visualize:
+                        print(f"          - {green}Found:{reset} {name}: {str_val}")
 
             return FunctionCallResult(
                 prompt=prompt.prompt,

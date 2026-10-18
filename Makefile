@@ -5,10 +5,8 @@ install:
 run:
 	uv run python -m src
 
-
 debug:
 	uv run python -m pdb -m src
-
 
 lint:
 	uv run flake8 src
@@ -20,7 +18,7 @@ lint:
 		--check-untyped-defs
 
 bonus:
-	uv run pytest -v
+	uv run python -m src --visualize
 
 clean:
 	find . -type d -name __pycache__ -exec rm -rf {} +

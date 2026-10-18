@@ -2,27 +2,29 @@
 name = "call-me-maybe"
 version = "0.1.0"
 description = ""
-readme = "README.md"
-requires-python = ">=3.12"
+authors = [
+    {name = "ahamouda"}
+]
+requires-python = ">=3.10"
 dependencies = [
-    "flake8>=7.3.0",
     "llm-sdk",
-    "mypy>=2.1.0",
-    "numpy>=2.4.4",
-    "pydantic>=2.13.3",
-    "torch>=2.11.0",
-    "transformers>=5.6.2",
-]
-
-[dependency-groups]
-dev = [
-    "pytest>=9.0.3",
-]
-
-[tool.uv.workspace]
-members = [
-    "llm_sdk",
+    "torch==2.2.2",
+    "pydantic>=2.12.0",
+    "transformers>=4.45.0,<5.0.0",
+    "huggingface-hub>=0.20.0",
+    "uv",
+    "flake8",
+    "mypy",
+    "pydantic",
+    "numpy<2.0",
 ]
 
 [tool.uv.sources]
-llm-sdk = { workspace = true }
+llm-sdk = {path = "llm_sdk"}
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
