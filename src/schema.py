@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
 
-class ResultValidation(BaseModel):
+class FunctionCallResult(BaseModel):
     """Model for validating function call results.
 
     Attributes:
