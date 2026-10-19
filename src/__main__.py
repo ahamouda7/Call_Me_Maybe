@@ -61,7 +61,7 @@ def main() -> None:
         if output_dir:
             os.makedirs(output_dir, exist_ok=True)
 
-        results = []
+        results: list[dict] = []
         for i, prompt in enumerate(validate_prom):
             if args.visualize:
                 if results:

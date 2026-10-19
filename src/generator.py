@@ -36,16 +36,24 @@ def build_prompt(
     return result
 
 
-# def is_valid_prompt(prompt: str) -> bool:
-#     if len(prompt.strip()) < 3:
-#         return False
-#
-#     words = prompt.strip().split()
-#     real_words = [
-#         w for w in words if w.isalpha() and len(w) > 12 and not w.isdigit()]
-#     if len(real_words) > 0:
-#         return False
-#     return True
+def is_valid_prompt(prompt: str) -> bool:
+    """Check if a prompt is valid and meaningful.
+
+    Args:
+        prompt: User input string to validate.
+
+    Returns:
+        True if prompt appears valid, False otherwise.
+    """
+    if len(prompt.strip()) < 3:
+        return False
+
+    words = prompt.strip().split()
+    real_words = [
+        w for w in words if w.isalpha() and len(w) > 12 and not w.isdigit()]
+    if len(real_words) > 0:
+        return False
+    return True
 
 
 def get_numeric_and_stop_token_ids(
@@ -174,10 +182,10 @@ def generate_function_call(
     blue = "\033[34m"
     reset = "\033[0m"
 
-    # if not is_valid_prompt(prompt.prompt):
-    #     return ResultValidation(
-    #         prompt=prompt.prompt, name="Invalid!",
-    #         parameters={"error": "prompt not recognized"})
+    if not is_valid_prompt(prompt.prompt):
+        return FunctionCallResult(
+            prompt=prompt.prompt, name="Invalid!",
+            parameters={"error": "prompt not recognized"})
 
     prompt_text = build_prompt(prompt.prompt, functions)
     input_ids = model.encode(prompt_text)[0].tolist()
@@ -213,8 +221,14 @@ def generate_function_call(
         current_function_prefix += next_token
         if current_function_prefix in function_names:
             if visualize:
-                print(f'        - {green}Found:{reset} "{current_function_prefix}"')
-                print(f"\n      {yellow}Generating function's parameters ...{reset}")
+                print(
+                    f'        - {green}Found:{reset} '
+                    f'"{current_function_prefix}"'
+                    )
+                print(
+                    "\n      "
+                    f"{yellow}Generating function's parameters ...{reset}"
+                    )
 
             selected_function = next(
                 fn for fn in functions if fn.name == current_function_prefix)
@@ -231,7 +245,10 @@ def generate_function_call(
             parameters: dict[str, float | str | int] = {}
             for i, (name, value) in enumerate(params):
                 if visualize:
-                    print(f"        {blue}Generating parameter {i + 1} ...{reset}")
+                    print(
+                        "        "
+                        f"{blue}Generating parameter {i + 1} ...{reset}"
+                        )
                 input_ids.append(token_to_id['"'])
                 for chr_id in model.encode(name)[0].tolist():
                     input_ids.append(chr_id)
@@ -257,7 +274,10 @@ def generate_function_call(
                         input_ids += ids
 
                     if visualize:
-                        print(f"          - {green}Found:{reset} {name}: {parameters[name]}")
+                        print(
+                            f"          - {green}Found:{reset} {name}: "
+                            f"{parameters[name]}"
+                            )
 
                     if i < len(params) - 1:
                         input_ids.append(token_to_id[','])
@@ -272,7 +292,10 @@ def generate_function_call(
                     parameters[name] = str_val
                     input_ids += ids
                     if visualize:
-                        print(f"          - {green}Found:{reset} {name}: {str_val}")
+                        print(
+                            "          "
+                            f"- {green}Found:{reset} {name}: {str_val}"
+                            )
 
             return FunctionCallResult(
                 prompt=prompt.prompt,

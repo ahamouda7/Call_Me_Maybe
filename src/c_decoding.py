@@ -26,7 +26,8 @@ def load_vocabulary(
 
 
 def get_valid_next_tokens(
-    current_prefix: str, function_names: list[str],
+    current_prefix: str,
+    function_names: list[str],
     token_to_id: dict[str, int]
 ) -> set[int]:
     """

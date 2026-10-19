@@ -1,4 +1,4 @@
-**This project has been created as part of the 42 curriculum by <your_42_login>.**
+*This project has been created as part of the 42 curriculum by ahamouda.*
 
 # Call Me Maybe — Introduction to Function Calling in LLMs
 
