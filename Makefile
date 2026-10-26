@@ -1,16 +1,16 @@
 
 install:
-	uv sync
+	@uv sync
 
 run:
-	uv run python -m src
+	@uv run python -m src
 
 debug:
-	uv run python -m pdb -m src
+	@uv run python -m pdb -m src
 
 lint:
-	uv run flake8 src
-	uv run mypy src \
+	@uv run flake8 src
+	@uv run mypy src \
 		--warn-return-any \
 		--warn-unused-ignores \
 		--ignore-missing-imports \
@@ -18,9 +18,9 @@ lint:
 		--check-untyped-defs
 
 bonus:
-	uv run python -m src --visualize
+	@uv run python -m src --visualize
 
 clean:
-	find . -type d -name __pycache__ -exec rm -rf {} +
-	find . -type d -name .mypy_cache -exec rm -rf {} +
-	find . -name "*.pyc" -delete
+	@find . -type d -name __pycache__ -exec rm -rf {} +
+	@find . -type d -name .mypy_cache -exec rm -rf {} +
+	@find . -name "*.pyc" -delete

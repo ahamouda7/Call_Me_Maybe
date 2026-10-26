@@ -203,10 +203,12 @@ def generate_function_call(
     gen_ids: list[int] = []
     function_names = [fn.name for fn in functions]
 
+    max_steps = max(len(name) for name in function_names)
+
     if visualize:
         print(f"      {yellow}Generating function name ...{reset}")
 
-    for _ in range(30):
+    for _ in range(max_steps):
         full_input_ids = input_ids + gen_ids
         logits = model.get_logits_from_input_ids(full_input_ids)
         logits_numpy = np.array(logits)
